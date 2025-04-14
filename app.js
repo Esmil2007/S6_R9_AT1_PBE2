@@ -14,18 +14,27 @@ app.get("/", (req, res) =>{
     console.log("GET /")
     //res.send("Alô SESI Sumaré");
     //res.send("<img src='./static/download.png'/>")
-    res.render("index");
+    res.render("./pages/index");
 });
 
 app.get("/sobre", (req, res) =>{
     console.log("GET /sobre")
-    //res.send("Você está na página sobre");
-    res.render("sobre");
+    res.render("./pages/sobre");
+});
+
+app.get("/cadastro", (req, res) =>{
+    console.log("GET /cadastro")
+    res.render("./pages/cadastro");
+});
+
+app.get("/login", (req, res) =>{
+    console.log("GET /login")
+    res.render("./pages/login");
 });
 
 app.get("/dashboard", (req, res) =>{
     console.log("GET /dashboard")
-    res.send("Você está na página dashboard");
+    res.render("./pages/dashboard");
 });
 
 app.listen(PORT);

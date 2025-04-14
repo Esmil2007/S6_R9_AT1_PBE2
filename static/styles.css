@@ -1,3 +1,92 @@
-*{
-    border: 1px solid red;
-}
+:root {
+    --primary-color: #6366f1;
+    --secondary-color: #4f46e5;
+    --text-color: #1e293b;
+    --light-gray: #f8fafc;
+    --dark-gray: #64748b;
+    --white: #ffffff;
+    --transition: all 0.3s ease;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    height: 100%;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--light-gray);
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  a {
+    text-decoration: none;
+    color: var(--primary-color);
+    transition: var(--transition);
+  }
+  
+  a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+  }
+  
+  /* Layout específico */
+  body > *:not(script) {
+    padding: 1rem;
+  }
+  
+  body > img {
+    padding: 2rem 1rem;
+  }
+  
+  /* Estilo para o conteúdo principal */
+  body > :nth-child(2) {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 1rem 0;
+    flex-grow: 1;
+  }
+  
+  /* Estilo para o link "Voltar" */
+  body > a {
+    display: inline-block;
+    margin: 1rem auto;
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-radius: 0.25rem;
+  }
+  
+  body > a:hover {
+    background-color: var(--secondary-color);
+    text-decoration: none;
+  }
+  
+  /* Responsividade */
+  @media (max-width: 768px) {
+    body > *:not(script) {
+      padding: 0.5rem;
+    }
+    
+    body > img {
+      padding: 1rem 0.5rem;
+    }
+  }
