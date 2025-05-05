@@ -5,6 +5,13 @@
 
 <body>    
     Página de cadastro<br><br><br>
+    <main><form action="/cadastro" method="post" class="formItens">
+        Seu nome:
+        <input type="text" name="username" id="username" placeholder="Digite seu nome de usuário"><br><br>
+        Senha:
+        <input type="password" name="password" id="password" placeholder="Digite sua senha"><br>
+        <button type="submit">Entrar</button>
+    </form></main>
     <%- include("../partials/menu") %>
     <br><br><br><br><br><br><a href="/">Voltar</a>
     <%- include("../partials/footer") %>

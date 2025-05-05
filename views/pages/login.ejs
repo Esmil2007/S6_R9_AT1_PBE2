@@ -5,8 +5,17 @@
 
 <body>    
     Página de login<br><br><br>
+    <main>
+        <form action="/login" method="post" class="formItens">
+            Seu nome:
+            <input type="text" name="username" id="username" placeholder="Digite seu nome de usuário"><br><br>
+            Senha:
+            <input type="password" name="password" id="senha" placeholder="Digite sua senha"><br>
+            <button type="submit">Entrar</button>
+        </form>
+    </main><br>
     <%- include("../partials/menu") %>
-    <br><br><br><br><br><br><a href="/">Voltar</a>
+    <br><br><a href="/">Voltar</a>
     <%- include("../partials/footer") %>
 </body>
 </html>
