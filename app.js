@@ -64,7 +64,7 @@ app.post("/cadastro", (req, res) => {
         if (row) {
             //2. Se o usuário existir e a senha é válida no BD, executar processo de login
             console.log(`Usuário: ${username} já cadastrado.`);
-            res.send("Usuário já cadastrado");
+            res.redirect("/ja-cadastrado");
         } else {
             //3. Se não, executar processo de negação de login
             const insert = "INSERT INTO users (username, password) VALUES (?,?)"
@@ -72,7 +72,7 @@ app.post("/cadastro", (req, res) => {
                 if (err) throw err;
 
                 console.log(`Usuário: ${username} cadastrado com sucesso.`)
-                res.redirect("/login");
+                res.redirect("/cadastro-com-sucesso");
             })
         }
 
@@ -105,7 +105,7 @@ app.post("/login", (req, res) => {
             res.redirect("/dashboard");
         } else {
             //3. Se não, executar processo de negação de login
-            res.send("Usuário inválido");
+            res.redirect("/incorreto");
         }
 
 
@@ -133,9 +133,33 @@ app.get("/dashboard", (req, res) => {
         res.render("pages/dashboard", { titulo: "Tabela de usuários", dados: row, req: req });
     })
     } else {
-        res.send("Usuário não logado");
+        res.redirect("/nao-autorizado");
     }
 });
+
+app.get("/nao-autorizado", (req, res) => {
+    res.render("./pages/nao-autorizado", { titulo: "Não Autorizado", req: req });
+    console.log("GET /nao-autorizado");
+});
+
+app.get("/ja-cadastrado", (req, res) => {
+    res.render("./pages/ja-cadastrado", { titulo: "Já Cadastrado", req: req });
+    console.log("GET /ja-cadastrado");
+});
+
+app.get("/incorreto", (req, res) => {
+    res.render("./pages/incorreto", { titulo: "Usuário ou senha incorretos", req: req });
+    console.log("GET /incorreto");
+});
+
+app.get("/cadastro-com-sucesso", (req, res) => {
+    res.render("./pages/cadastro-com-sucesso", { titulo: "Cadastro com Sucesso", req: req });
+    console.log("GET /cadastro-com-sucesso");
+});
+
+app.use('/{*erro}', (req, res) => {
+    res.status(404).render('./pages/erro404', { titulo: "ERRO 404", req: req, msg: "404" });
+  });
 
 app.listen(PORT);
 

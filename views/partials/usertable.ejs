@@ -1,4 +1,5 @@
 <%- console.log("USERTABLE:",JSON.stringify(dados)) %>
+<%- console.log(JSON.stringify(req.session)) %>
 <table>
     <thead>
     <tr>
@@ -9,7 +10,12 @@
     </thead>
     <tbody>
         <% let i; for(i=0; i<dados.length; i++) { %>
-            <tr>
+            <% if (dados [i].username==req.session.username) {%>
+                <tr style="background-color: rgb(255, 0, 0); color: white;">
+                    <%} else {%>
+                <tr>
+                    <% }%>
+            
                 <td><%= dados[i].id %></td>
                 <td><%= dados[i].username %></td>
                 <td><%= dados[i].password %></td>

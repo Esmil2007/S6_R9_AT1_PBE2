@@ -1,13 +1,29 @@
 :root {
-    --primary-color: #6366f1;
-    --secondary-color: #4f46e5;
-    --text-color: #1e293b;
-    --light-gray: #f8fafc;
-    --dark-gray: #64748b;
-    --white: #ffffff;
+    --primary-color: #ff0000;
+    --secondary-color: #000000;
+    --text-color: #000000;
     --transition: all 0.3s ease;
+    background-color: rgb(189, 189, 189);
+  }
+
+  footer{
+    background-color: #ff0000;
+    color: white;
+    padding: 0px;
+    text-align: center;
+    margin-top: auto; 
   }
   
+  header {
+    background-color: red;
+    width: 100%;
+    padding: 10px 0;
+    margin: 0;
+    position: relative;
+    left: 0;
+    top: 0;
+}
+
   * {
     margin: 0;
     padding: 0;
@@ -40,53 +56,43 @@
     text-decoration: none;
     color: var(--primary-color);
     transition: var(--transition);
+    font-weight: bold;
   }
   
   a:hover {
     color: var(--secondary-color);
     text-decoration: underline;
+    font-weight: bold;
   }
-  
-  /* Layout específico */
-  body > *:not(script) {
-    padding: 1rem;
-  }
-  
-  body > img {
-    padding: 2rem 1rem;
-  }
-  
-  /* Estilo para o conteúdo principal */
-  body > :nth-child(2) {
-    font-size: 1.5rem;
-    font-weight: 600;
-    text-align: center;
-    margin: 1rem 0;
-    flex-grow: 1;
-  }
-  
-  /* Estilo para o link "Voltar" */
-  body > a {
-    display: inline-block;
-    margin: 1rem auto;
-    padding: 0.5rem 1rem;
-    background-color: var(--primary-color);
-    color: var(--white);
-    border-radius: 0.25rem;
-  }
-  
-  body > a:hover {
-    background-color: var(--secondary-color);
+
+  menu {
+    background-color: red;
+    padding: 20px;
+    width: fit-content;
+    width: 100%;
+}
+
+menu nav {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+menu a {
+    color: white;
     text-decoration: none;
-  }
-  
-  /* Responsividade */
-  @media (max-width: 768px) {
-    body > *:not(script) {
-      padding: 0.5rem;
-    }
-    
-    body > img {
-      padding: 1rem 0.5rem;
-    }
-  }
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 5px 0;
+    font-weight: bold;
+    padding: 5px 10px;
+}
+
+menu a:hover {
+    text-decoration: underline;
+    color: rgb(0, 0, 0);
+    transition: var(--transition);
+    background-color: rgba(255, 255, 255, 0.315);  
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}

@@ -2,7 +2,7 @@
 <html lang="en">
 
 <%- include("../partials/head") %>
-
+<%- include("../partials/menu") %>
 <body>    
     Página de cadastro<br><br><br>
     <main><form action="/cadastro" method="post" class="formItens">
@@ -12,8 +12,8 @@
         <input type="password" name="password" id="password" placeholder="Digite sua senha"><br>
         <button type="submit">Entrar</button>
     </form></main>
-    <%- include("../partials/menu") %>
-    <br><br><br><br><br><br><a href="/">Voltar</a>
+    
+    <br><br><br><br><br><br><a href="/">Home</a>
     <%- include("../partials/footer") %>
 </body>
 </html>
