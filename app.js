@@ -36,17 +36,17 @@ app.get("/", (req, res) => {
     console.log("GET /")
     //res.send("Alô SESI Sumaré");
     //res.send("<img src='./static/download.png'/>")
-    res.render("./pages/index", { titulo: "Index" });
+    res.render("./pages/index", { titulo: "Index", req: req });
 });
 
 app.get("/sobre", (req, res) => {
     console.log("GET /sobre")
-    res.render("./pages/sobre", { titulo: "Sobre" });
+    res.render("./pages/sobre", { titulo: "Sobre", req: req });
 });
 
 app.get("/cadastro", (req, res) => {
     console.log("GET /cadastro")
-    res.render("./pages/cadastro", { titulo: "Cadastro" });
+    res.render("./pages/cadastro", { titulo: "Cadastro", req: req });
 });
 
 app.post("/cadastro", (req, res) => {
@@ -84,7 +84,7 @@ app.post("/cadastro", (req, res) => {
 
 app.get("/login", (req, res) => {
     console.log("GET /login")
-    res.render("./pages/login", { titulo: "Login" });
+    res.render("./pages/login", { titulo: "Login", req: req });
 });
 
 app.post("/login", (req, res) => {
@@ -130,7 +130,7 @@ app.get("/dashboard", (req, res) => {
     db.all(query, [], (err, row) => {
         if (err) throw err;
         console.log(JSON.stringify(row));
-        res.render("pages/dashboard", { titulo: "Tabela de usuários", dados: row });
+        res.render("pages/dashboard", { titulo: "Tabela de usuários", dados: row, req: req });
     })
     } else {
         res.send("Usuário não logado");
