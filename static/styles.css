@@ -96,3 +96,9 @@ menu a:hover {
     border-radius: 4px;
     transition: all 0.3s ease;
 }
+
+table {
+  width: 100%;
+  justify-content: space-around;
+  text-align: center;
+}

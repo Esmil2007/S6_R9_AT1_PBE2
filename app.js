@@ -14,6 +14,9 @@ db.serialize(() => {
     db.run(
         "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)"
     )
+    db.run(
+        "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, id_users INTEGER, titulo TEXT, conteudo TEXT, data_criacao TEXT)"
+    )
 })
 
 app.use(
@@ -99,9 +102,11 @@ app.post("/login", (req, res) => {
         //1. Verificar se o usuário existe
         console.log(JSON.stringify(row));
         if (row) {
+            console.log("SELECT da tabela users: ", row);
             //2. Se o usuário existir e a senha é válida no BD, executar processo de login
             req.session.username = username;
             req.session.loggedin = true;
+            req.session.id_username = row.id;
             res.redirect("/dashboard");
         } else {
             //3. Se não, executar processo de negação de login
@@ -113,6 +118,42 @@ app.post("/login", (req, res) => {
 
     //res.render("./pages/login");
 });
+
+app.get("/post_create", (req, res) =>{
+    console.log("GET /post_create");
+    //verificar se o usuário está logado
+    //se estiver logado, envie o formulário para a criação do post
+    if(req.session.loggedin){
+        res.render("pages/post_form", {titulo: "Criar postagem", req: req})
+    } else {  // se não estiver logado, redirect para /nao-autorizado
+        res.redirect("/nao-autorizado")
+    }
+    
+});
+
+app.post("/post_create", (req, res) =>{
+    console.log("POST /post_create");
+    //Pegar dados da postagem: UserID, Titulo Postagem, Conteúdo da postagem, Data da postagem
+
+    //req.session.username, req.session.id_username
+    if(req.session.loggedin){
+    console.log("Dados da postagem: ", req.body);
+    const { titulo, conteudo} = req.body;
+    const data_criacao = new Date();
+    const data = data_criacao.toLocaleDateString();
+    console.log("Data da criação:", data, "Username: ", req.session.username, "id_username: ", req.session.id_username);
+
+    const query = "INSERT INTO posts (id_users, titulo, conteudo, data_criacao) VALUES (?, ?, ?, ?)"
+
+    db.get(query, [req.session.id_username, titulo, conteudo, data], (err) =>{
+        if(err) throw err;
+        res.send('Post criado');
+    })
+
+    } else {
+        res.redirect("/nao-autorizado");
+    }
+})
 
 app.get("/logout", (req, res) =>{
     console.log("GET /logout");

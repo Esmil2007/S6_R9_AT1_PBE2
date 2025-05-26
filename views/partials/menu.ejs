@@ -2,10 +2,11 @@
     <nav>
     <a href="/sobre">Página Sobre</a>
     <% if(!req.session.loggedin) { %>
-    <a href="/cadastro">Página de Cadastro</a>
-    <a href="/login">Página de Login</a>
+    <a href="/cadastro">Cadastro</a>
+    <a href="/login">Login</a>
     <% } else { %>
-    <a href="/dashboard">Página Dashboard</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/post_create">Criação de Postagem</a>
     <a href="/logout">Logout</a>
     <% } %>
     </nav>
