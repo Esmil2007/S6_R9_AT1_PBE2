@@ -178,6 +178,22 @@ app.get("/dashboard", (req, res) => {
     }
 });
 
+app.get("/tabela-posts", (req, res) => {
+    console.log("GET /tabela-posts")
+    //res.render("./pages/dashboard", {titulo: "Dashboard"});
+    //Listar todos os usurios
+    //if(req.session.loggedin){
+    const query = "SELECT * FROM posts";
+    db.all(query, [], (err, row) => {
+        if (err) throw err;
+        console.log(JSON.stringify(row));
+        res.render("pages/tabela-posts", { titulo: "Tabela de posts", dados: row, req: req });
+    })
+    //} else {
+        //res.redirect("/nao-autorizado");
+    //}
+});
+
 app.get("/nao-autorizado", (req, res) => {
     res.render("./pages/nao-autorizado", { titulo: "Não Autorizado", req: req });
     console.log("GET /nao-autorizado");
