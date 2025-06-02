@@ -1,12 +1,12 @@
 <menu>
     <nav>
-    <a href="/sobre">Página Sobre</a>
+    <a href="/sobre">Sobre</a>
     <% if(!req.session.loggedin) { %>
     <a href="/cadastro">Cadastro</a>
     <a href="/login">Login</a>
     <% } else { %>
     <a href="/dashboard">Dashboard</a>
-    <a href="/post_create">Criação de Postagem</a>
+    <a href="/post_create">Criar Postagem</a>
     <a href="/logout">Logout</a>
     <% } %>
     </nav>
