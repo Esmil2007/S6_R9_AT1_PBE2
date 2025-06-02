@@ -147,7 +147,7 @@ app.post("/post_create", (req, res) =>{
 
     db.get(query, [req.session.id_username, titulo, conteudo, data], (err) =>{
         if(err) throw err;
-        res.send('Post criado');
+        res.redirect('/tabela-posts');
     })
 
     } else {
