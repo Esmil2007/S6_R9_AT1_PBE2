@@ -17,7 +17,6 @@ db.serialize(() => {
     db.run(
         "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, id_users INTEGER, titulo TEXT, conteudo TEXT, data_criacao TEXT)"
     )
-<<<<<<< HEAD
    const usuarios = [
     [2, '43541034866', '123'],
     [3, 'kaikesmil13@gmail.com', '123'],
@@ -28,9 +27,6 @@ db.serialize(() => {
     stmt.run(user);
   });
   stmt.finalize();
-=======
-    
->>>>>>> dev
 })
 
 app.use(
