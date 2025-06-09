@@ -18,7 +18,6 @@ db.serialize(() => {
         "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, id_users INTEGER, titulo TEXT, conteudo TEXT, data_criacao TEXT)"
     )
     
-
 })
 
 app.use(
@@ -162,7 +161,7 @@ app.post("/post_create", (req, res) =>{
 
     db.get(query, [req.session.id_username, titulo, conteudo, data], (err) =>{
         if(err) throw err;
-        res.send('Post criado');
+        res.redirect('/tabela-posts');
     })
 
     } else {
@@ -191,6 +190,22 @@ app.get("/dashboard", (req, res) => {
     } else {
         res.redirect("/nao-autorizado");
     }
+});
+
+app.get("/tabela-posts", (req, res) => {
+    console.log("GET /tabela-posts")
+    //res.render("./pages/dashboard", {titulo: "Dashboard"});
+    //Listar todos os usurios
+    //if(req.session.loggedin){
+    const query = "SELECT * FROM posts";
+    db.all(query, [], (err, row) => {
+        if (err) throw err;
+        console.log(JSON.stringify(row));
+        res.render("pages/tabela-posts", { titulo: "Tabela de posts", dados: row, req: req });
+    })
+    //} else {
+        //res.redirect("/nao-autorizado");
+    //}
 });
 
 app.get("/nao-autorizado", (req, res) => {
