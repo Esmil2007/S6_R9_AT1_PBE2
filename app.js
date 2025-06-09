@@ -18,7 +18,7 @@ db.serialize(() => {
         "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, id_users INTEGER, titulo TEXT, conteudo TEXT, data_criacao TEXT)"
     )
   
-  stmt.finalize();
+
 })
 
 app.use(
