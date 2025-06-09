@@ -208,3 +208,32 @@ app.listen(PORT, () => {
     console.log(`Servidor sendo executado na porta ${PORT}`);
     console.log(__dirname + "\\static");
 });
+
+app.get("/criticas", (req, res) => {
+    console.log("GET /criticas");
+
+    const query = `
+        SELECT posts.*, users.username FROM posts
+        INNER JOIN users ON users.id = posts.id_users
+        ORDER BY posts.id DESC`;
+
+    db.all(query, [], (err, rows) => {
+        if (err) throw err;
+        res.render("pages/criticas", { titulo: "Críticas de Viagem", criticas: rows, req: req });
+    });
+});
+
+app.get("/minhas-criticas", (req, res) => {
+    console.log("GET /minhas-criticas");
+
+    if (req.session.loggedin) {
+        const query = "SELECT * FROM posts WHERE id_users = ? ORDER BY id DESC";
+
+        db.all(query, [req.session.id_username], (err, rows) => {
+            if (err) throw err;
+            res.render("pages/minhas-criticas", { titulo: "Minhas Críticas", criticas: rows, req: req });
+        });
+    } else {
+        res.redirect("/nao-autorizado");
+    }
+});

@@ -9,4 +9,13 @@
     
     <%- include("../partials/footer") %>
 </body>
+
+<ul>
+    <li><a href="/criticas">Ver Críticas</a></li>
+    <% if (req.session.loggedin) { %>
+        <li><a href="/post_create">Criar Crítica</a></li>
+        <li><a href="/minhas-criticas">Minhas Críticas</a></li>
+    <% } %>
+</ul>
+
 </html>
