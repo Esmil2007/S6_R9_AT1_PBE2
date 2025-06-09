@@ -17,16 +17,7 @@ db.serialize(() => {
     db.run(
         "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, id_users INTEGER, titulo TEXT, conteudo TEXT, data_criacao TEXT)"
     )
-   const usuarios = [
-    [2, '43541034866', '123'],
-    [3, 'kaikesmil13@gmail.com', '123'],
-    [4, 'amigodogui', '123']
-  ];
-  const stmt = db.prepare("INSERT INTO users (id, username, password) VALUES (?, ?, ?)");
-  usuarios.forEach(user => {
-    stmt.run(user);
-  });
-  stmt.finalize();
+
 })
 
 app.use(
