@@ -62,7 +62,7 @@ app.post("/cadastro", [
     .isAlphanumeric().withMessage('Usuário deve conter apenas letras e números.')
     .trim().escape(),
   body('password')
-    .isLength({ min: 6 }).withMessage('A senha deve ter pelo menos 6 caracteres.')
+    .isLength({ min: 3 }).withMessage('A senha deve ter pelo menos 6 caracteres.')
     .trim()
 ], async (req, res) => {
   console.log("POST /cadastro");
