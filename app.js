@@ -11,6 +11,7 @@ const PORT = 8000;
 const db = new sqlite3.Database("users.db");
 
 const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcrypt');
 
 db.serialize(() => {
     db.run(
@@ -55,46 +56,55 @@ app.get("/cadastro", (req, res) => {
     res.render("./pages/cadastro", { titulo: "Cadastro", req: req });
 });
 
-app.post("/cadastro", (req, res) => {
-    console.log("POST /cadastro");
-    console.log(JSON.stringify(req.body));
-    const { username, password } = req.body;
+app.post("/cadastro", [
+  // Validação dos campos
+  body('username')
+    .isAlphanumeric().withMessage('Usuário deve conter apenas letras e números.')
+    .trim().escape(),
+  body('password')
+    .isLength({ min: 6 }).withMessage('A senha deve ter pelo menos 6 caracteres.')
+    .trim()
+], async (req, res) => {
+  console.log("POST /cadastro");
+  console.log(JSON.stringify(req.body));
 
-    if (!username || !password || username.trim() === '' || password.trim() === '') {
-    // Se estiverem vazios, retorna erro HTTP 400 (requisição inválida)
-     return res.status(400).send('Usuário e senha são obrigatórios.');
-  }   
+  // Verifica erros de validação
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log("Erros de validação:", errors.array());
+    return res.status(400).send('Dados inválidos: ' + errors.array().map(e => e.msg).join(', '));
+  }
 
-    const query = "SELECT * FROM users WHERE username =?"
+  const { username, password } = req.body;
 
+  const query = "SELECT * FROM users WHERE username = ?";
+  db.get(query, [username], async (err, row) => {
+    if (err) {
+      console.error("Erro na consulta SELECT:", err);
+      return res.status(500).send("Erro no servidor");
+    }
 
-    db.get(query, [username,], (err, row) => {
-        
-        if (err) throw err;
+    if (row) {
+      console.log(`Usuário: ${username} já cadastrado.`);
+      return res.redirect("/ja-cadastrado");
+    }
 
-        //1. Verificar se o usuário existe
-        console.log("Query SELECT do cadastro:", JSON.stringify(row));
-        if (row) {
-            //2. Se o usuário existir e a senha é válida no BD, executar processo de login
-            console.log(`Usuário: ${username} já cadastrado.`);
-            res.redirect("/ja-cadastrado");
-        } else {
-            //3. Se não, executar processo de negação de login
-            const insert = "INSERT INTO users (username, password) VALUES (?,?)"
-            db.get(insert, [username, password], (err, row) => {
-                if (err) throw err;
+    // Cria hash da senha com bcrypt
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-                console.log(`Usuário: ${username} cadastrado com sucesso.`)
-                res.redirect("/login");
-            })
-        }
-          
+    const insert = "INSERT INTO users (username, password) VALUES (?, ?)";
+    db.run(insert, [username, hashedPassword], function (err) {
+      if (err) {
+        console.error("Erro ao inserir usuário:", err);
+        return res.status(500).send("Erro ao cadastrar");
+      }
 
-
-    })
-
-    //res.render("./pages/login");
-})
+      console.log(`Usuário: ${username} cadastrado com sucesso.`);
+      res.redirect("/login");
+    });
+  });
+});
 
 app.get("/login", (req, res) => {
     console.log("GET /login")
@@ -102,8 +112,8 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", [
-  body('username').isAlphanumeric().withMessage('Usuário inválido').trim().escape(),
-  body('password').isLength({ min: 3 }).withMessage('Senha inválida').trim()
+    body('username').isAlphanumeric().withMessage('Usuário inválido').trim().escape(),
+    body('password').isLength({ min: 3 }).withMessage('Senha inválida').trim()
 ], (req, res) => {
     console.log("POST /login")
     console.log(JSON.stringify(req.body));
@@ -138,50 +148,50 @@ app.post("/login", [
     });
 });
 
-app.get("/post_create", (req, res) =>{
+app.get("/post_create", (req, res) => {
     console.log("GET /post_create");
     //verificar se o usuário está logado
     //se estiver logado, envie o formulário para a criação do post
-    if(req.session.loggedin){
-        res.render("pages/post_form", {titulo: "Criar postagem", req: req})
+    if (req.session.loggedin) {
+        res.render("pages/post_form", { titulo: "Criar postagem", req: req })
     } else {  // se não estiver logado, redirect para /nao-autorizado
         res.redirect("/nao-autorizado")
     }
-    
+
 });
 
-app.post("/post_create", (req, res) =>{
+app.post("/post_create", (req, res) => {
     console.log("POST /post_create");
     //Pegar dados da postagem: UserID, Titulo Postagem, Conteúdo da postagem, Data da postagem
 
     //req.session.username, req.session.id_username
-    if(req.session.loggedin){
-    console.log("Dados da postagem: ", req.body);
-    const { titulo, conteudo} = req.body;
-       if (!titulo || !conteudo || titulo.trim() === '' || conteudo.trim() === '') {
-    // Se estiverem vazios, retorna erro HTTP 400 (requisição inválida)
-     return res.status(400).send('Usuário e senha são obrigatórios.');
-  }   
+    if (req.session.loggedin) {
+        console.log("Dados da postagem: ", req.body);
+        const { titulo, conteudo } = req.body;
+        if (!titulo || !conteudo || titulo.trim() === '' || conteudo.trim() === '') {
+            // Se estiverem vazios, retorna erro HTTP 400 (requisição inválida)
+            return res.status(400).send('Usuário e senha são obrigatórios.');
+        }
 
-    const data_criacao = new Date();
-    const data = data_criacao.toLocaleDateString();
-    console.log("Data da criação:", data, "Username: ", req.session.username, "id_username: ", req.session.id_username);
+        const data_criacao = new Date();
+        const data = data_criacao.toLocaleDateString();
+        console.log("Data da criação:", data, "Username: ", req.session.username, "id_username: ", req.session.id_username);
 
-    const query = "INSERT INTO posts (id_users, titulo, conteudo, data_criacao) VALUES (?, ?, ?, ?)"
+        const query = "INSERT INTO posts (id_users, titulo, conteudo, data_criacao) VALUES (?, ?, ?, ?)"
 
-    db.get(query, [req.session.id_username, titulo, conteudo, data], (err) =>{
-        if(err) throw err;
-        res.redirect('/tabela-posts');
-    })
+        db.get(query, [req.session.id_username, titulo, conteudo, data], (err) => {
+            if (err) throw err;
+            res.redirect('/tabela-posts');
+        })
 
     } else {
         res.redirect("/nao-autorizado");
     }
 })
 
-app.get("/logout", (req, res) =>{
+app.get("/logout", (req, res) => {
     console.log("GET /logout");
-    req.session.destroy(() =>{
+    req.session.destroy(() => {
         res.redirect("/");
     });
 });
@@ -190,13 +200,13 @@ app.get("/dashboard", (req, res) => {
     console.log("GET /dashboard")
     //res.render("./pages/dashboard", {titulo: "Dashboard"});
     //Listar todos os usurios
-    if(req.session.loggedin){
-    const query = "SELECT * FROM users";
-    db.all(query, [], (err, row) => {
-        if (err) throw err;
-        console.log(JSON.stringify(row));
-        res.render("pages/dashboard", { titulo: "Tabela de usuários", dados: row, req: req });
-    })
+    if (req.session.loggedin) {
+        const query = "SELECT * FROM users";
+        db.all(query, [], (err, row) => {
+            if (err) throw err;
+            console.log(JSON.stringify(row));
+            res.render("pages/dashboard", { titulo: "Tabela de usuários", dados: row, req: req });
+        })
     } else {
         res.redirect("/nao-autorizado");
     }
@@ -214,7 +224,7 @@ app.get("/tabela-posts", (req, res) => {
         res.render("pages/tabela-posts", { titulo: "Tabela de posts", dados: row, req: req });
     })
     //} else {
-        //res.redirect("/nao-autorizado");
+    //res.redirect("/nao-autorizado");
     //}
 });
 
@@ -240,7 +250,7 @@ app.get("/cadastro-com-sucesso", (req, res) => {
 
 app.use('/{*erro}', (req, res) => {
     res.status(404).render('./pages/erro404', { titulo: "ERRO 404", req: req, msg: "404" });
-  });
+});
 
 app.listen(PORT);
 
