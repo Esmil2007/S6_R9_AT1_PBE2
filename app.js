@@ -57,53 +57,53 @@ app.get("/cadastro", (req, res) => {
 });
 
 app.post("/cadastro", [
-  // Validação dos campos
-  body('username')
-    .isAlphanumeric().withMessage('Usuário deve conter apenas letras e números.')
-    .trim().escape(),
-  body('password')
-    .isLength({ min: 3 }).withMessage('A senha deve ter pelo menos 6 caracteres.')
-    .trim()
+    // Validação dos campos
+    body('username')
+        .isAlphanumeric().withMessage('Usuário deve conter apenas letras e números.')
+        .trim().escape(),
+    body('password')
+        .isLength({ min: 3 }).withMessage('A senha deve ter pelo menos 6 caracteres.')
+        .trim()
 ], async (req, res) => {
-  console.log("POST /cadastro");
-  console.log(JSON.stringify(req.body));
+    console.log("POST /cadastro");
+    console.log(JSON.stringify(req.body));
 
-  // Verifica erros de validação
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log("Erros de validação:", errors.array());
-    return res.status(400).send('Dados inválidos: ' + errors.array().map(e => e.msg).join(', '));
-  }
-
-  const { username, password } = req.body;
-
-  const query = "SELECT * FROM users WHERE username = ?";
-  db.get(query, [username], async (err, row) => {
-    if (err) {
-      console.error("Erro na consulta SELECT:", err);
-      return res.status(500).send("Erro no servidor");
+    // Verifica erros de validação
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log("Erros de validação:", errors.array());
+        return res.status(400).send('Dados inválidos: ' + errors.array().map(e => e.msg).join(', '));
     }
 
-    if (row) {
-      console.log(`Usuário: ${username} já cadastrado.`);
-      return res.redirect("/ja-cadastrado");
-    }
+    const { username, password } = req.body;
 
-    // Cria hash da senha com bcrypt
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const query = "SELECT * FROM users WHERE username = ?";
+    db.get(query, [username], async (err, row) => {
+        if (err) {
+            console.error("Erro na consulta SELECT:", err);
+            return res.status(500).send("Erro no servidor");
+        }
 
-    const insert = "INSERT INTO users (username, password) VALUES (?, ?)";
-    db.run(insert, [username, hashedPassword], function (err) {
-      if (err) {
-        console.error("Erro ao inserir usuário:", err);
-        return res.status(500).send("Erro ao cadastrar");
-      }
+        if (row) {
+            console.log(`Usuário: ${username} já cadastrado.`);
+            return res.redirect("/ja-cadastrado");
+        }
 
-      console.log(`Usuário: ${username} cadastrado com sucesso.`);
-      res.redirect("/login");
+        // Cria hash da senha com bcrypt
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        const insert = "INSERT INTO users (username, password) VALUES (?, ?)";
+        db.run(insert, [username, hashedPassword], function (err) {
+            if (err) {
+                console.error("Erro ao inserir usuário:", err);
+                return res.status(500).send("Erro ao cadastrar");
+            }
+
+            console.log(`Usuário: ${username} cadastrado com sucesso.`);
+            res.redirect("/login");
+        });
     });
-  });
 });
 
 app.get("/login", (req, res) => {
@@ -112,40 +112,55 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", [
-    body('username').isAlphanumeric().withMessage('Usuário inválido').trim().escape(),
-    body('password').isLength({ min: 3 }).withMessage('Senha inválida').trim()
+  body('username').isAlphanumeric().withMessage('Usuário inválido').trim().escape(),
+  body('password').isLength({ min: 6 }).withMessage('Senha inválida').trim()
 ], (req, res) => {
-    console.log("POST /login")
-    console.log(JSON.stringify(req.body));
+  console.log("POST /login");
+  console.log(JSON.stringify(req.body));
 
-    // Validação dos dados
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        console.log("Erros de validação:", errors.array());
-        return res.redirect("/incorreto");
+  //  Verifica se os dados passaram na validação
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log("Erros de validação:", errors.array());
+    return res.redirect("/incorreto");
+  }
+
+  const { username, password } = req.body;
+
+  //  Busca o usuário pelo username (sem comparar senha ainda)
+  const query = "SELECT * FROM users WHERE username = ?";
+  db.get(query, [username], async (err, row) => {
+    if (err) {
+      console.error("Erro no banco:", err);
+      return res.status(500).send("Erro interno");
     }
 
-    const { username, password } = req.body;
+    // Se o usuário não existe
+    if (!row) {
+      console.log("Usuário não encontrado.");
+      return res.redirect("/incorreto");
+    }
 
-    const query = "SELECT * FROM users WHERE username=? AND password=?";
-    db.get(query, [username, password], (err, row) => {
-        if (err) {
-            console.error("Erro no banco:", err);
-            return res.status(500).send("Erro interno");
-        }
+    try {
+      //  Compara a senha digitada com o hash salvo
+      const match = await bcrypt.compare(password, row.password);
 
-        console.log("Resultado da consulta:", JSON.stringify(row));
-        if (row) {
-            // Usuário válido
-            req.session.username = username;
-            req.session.loggedin = true;
-            req.session.id_username = row.id;
-            res.redirect("/dashboard");
-        } else {
-            // Usuário inválido
-            res.redirect("/incorreto");
-        }
-    });
+      if (match) {
+        // Senha correta
+        req.session.username = username;
+        req.session.loggedin = true;
+        req.session.id_username = row.id;
+        res.redirect("/post_create");
+      } else {
+        //  Senha incorreta
+        console.log("Senha incorreta.");
+        res.redirect("/incorreto");
+      }
+    } catch (compareError) {
+      console.error("Erro ao comparar senhas:", compareError);
+      res.status(500).send("Erro interno ao verificar senha");
+    }
+  });
 });
 
 app.get("/post_create", (req, res) => {
@@ -258,3 +273,5 @@ app.listen(PORT, () => {
     console.log(`Servidor sendo executado na porta ${PORT}`);
     console.log(__dirname + "\\static");
 });
+
+//Senha do usuario é 123456
