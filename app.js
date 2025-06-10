@@ -10,6 +10,8 @@ const PORT = 8000;
 //Conexao com o BD
 const db = new sqlite3.Database("users.db");
 
+const { body, validationResult } = require('express-validator');
+
 db.serialize(() => {
     db.run(
         "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)"
@@ -17,7 +19,7 @@ db.serialize(() => {
     db.run(
         "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, id_users INTEGER, titulo TEXT, conteudo TEXT, data_criacao TEXT)"
     )
-   
+
 })
 
 app.use(
@@ -99,33 +101,41 @@ app.get("/login", (req, res) => {
     res.render("./pages/login", { titulo: "Login", req: req });
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", [
+  body('username').isAlphanumeric().withMessage('Usuário inválido').trim().escape(),
+  body('password').isLength({ min: 3 }).withMessage('Senha inválida').trim()
+], (req, res) => {
     console.log("POST /login")
     console.log(JSON.stringify(req.body));
+
+    // Validação dos dados
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log("Erros de validação:", errors.array());
+        return res.redirect("/incorreto");
+    }
+
     const { username, password } = req.body;
 
-    const query = "SELECT * FROM users WHERE username=? AND password=?"
+    const query = "SELECT * FROM users WHERE username=? AND password=?";
     db.get(query, [username, password], (err, row) => {
-        if (err) throw err;
+        if (err) {
+            console.error("Erro no banco:", err);
+            return res.status(500).send("Erro interno");
+        }
 
-        //1. Verificar se o usuário existe
-        console.log(JSON.stringify(row));
+        console.log("Resultado da consulta:", JSON.stringify(row));
         if (row) {
-            console.log("SELECT da tabela users: ", row);
-            //2. Se o usuário existir e a senha é válida no BD, executar processo de login
+            // Usuário válido
             req.session.username = username;
             req.session.loggedin = true;
             req.session.id_username = row.id;
             res.redirect("/dashboard");
         } else {
-            //3. Se não, executar processo de negação de login
+            // Usuário inválido
             res.redirect("/incorreto");
         }
-
-
-    })
-
-    //res.render("./pages/login");
+    });
 });
 
 app.get("/post_create", (req, res) =>{
