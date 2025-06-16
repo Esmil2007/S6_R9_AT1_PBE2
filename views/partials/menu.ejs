@@ -6,7 +6,9 @@
     <% if(!req.session.loggedin) { %>
     <a href="/login">Login</a>
     <% } else { %>
+        <% if (req.session.adm) {%>
     <a href="/dashboard">Dashboard</a>
+    <a href="/tabela-posts">Posts</a>
     <a href="/post_create">Criar Post</a>
     <a href="/logout">Logout</a>
     <% } %>
