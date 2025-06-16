@@ -1,9 +1,16 @@
 const express = require("express");
 const session = require("express-session");
 const sqlite3 = require("sqlite3");
+const helmet = require("helmet");
+const cors = require("cors");
+const bodyparser = require("body-parser");
+
 //const bodyparser = require("body-parser");
 
 const app = express();
+
+app.use(helmet())
+app.use(bodyparser.json({limit:"3mb"}))
 
 const PORT = 8000;
 
@@ -15,7 +22,7 @@ const bcrypt = require('bcrypt');
 
 db.serialize(() => {
     db.run(
-        "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)"
+        "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, perfil TEXT(3))"
     )
     db.run(
         "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, id_users INTEGER, titulo TEXT, conteudo TEXT, data_criacao TEXT)"
@@ -92,9 +99,10 @@ app.post("/cadastro", [
         // Cria hash da senha com bcrypt
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const perfil = "adm"
 
-        const insert = "INSERT INTO users (username, password) VALUES (?, ?)";
-        db.run(insert, [username, hashedPassword], function (err) {
+        const insert = "INSERT INTO users (username, password, perfil) VALUES (?, ?, ?)";
+        db.run(insert, [username, hashedPassword, perfil ], function (err) {
             if (err) {
                 console.error("Erro ao inserir usuário:", err);
                 return res.status(500).send("Erro ao cadastrar");
@@ -113,7 +121,7 @@ app.get("/login", (req, res) => {
 
 app.post("/login", [
   body('username').isAlphanumeric().withMessage('Usuário inválido').trim().escape(),
-  body('password').isLength({ min: 6 }).withMessage('Senha inválida').trim()
+  body('password').isLength({ min: 3 }).withMessage('Senha inválida').trim()
 ], (req, res) => {
   console.log("POST /login");
   console.log(JSON.stringify(req.body));
@@ -122,7 +130,7 @@ app.post("/login", [
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log("Erros de validação:", errors.array());
-    return res.redirect("/incorreto");
+    return res.redirect("/incorreto"); // Página de erro de login
   }
 
   const { username, password } = req.body;
@@ -132,7 +140,7 @@ app.post("/login", [
   db.get(query, [username], async (err, row) => {
     if (err) {
       console.error("Erro no banco:", err);
-      return res.status(500).send("Erro interno");
+      return res.status(500).send("Erro interno no servidor");
     }
 
     // Se o usuário não existe
@@ -150,18 +158,27 @@ app.post("/login", [
         req.session.username = username;
         req.session.loggedin = true;
         req.session.id_username = row.id;
-        res.redirect("/post_create");
+        req.session.perfil = row.perfil;
+
+        if (row.perfil === "adm") {
+          req.session.adm = true;
+          return res.redirect("/dashboard"); // Rota exclusiva para admin
+        } else {
+          req.session.adm = false;
+          return res.redirect("/"); // Página padrão do usuário
+        }
       } else {
-        //  Senha incorreta
         console.log("Senha incorreta.");
-        res.redirect("/incorreto");
+        return res.redirect("/incorreto");
       }
+
     } catch (compareError) {
       console.error("Erro ao comparar senhas:", compareError);
-      res.status(500).send("Erro interno ao verificar senha");
+      return res.status(500).send("Erro interno ao verificar senha");
     }
   });
 });
+
 
 app.get("/post_create", (req, res) => {
     console.log("GET /post_create");
@@ -215,7 +232,7 @@ app.get("/dashboard", (req, res) => {
     console.log("GET /dashboard")
     //res.render("./pages/dashboard", {titulo: "Dashboard"});
     //Listar todos os usurios
-    if (req.session.loggedin) {
+    if (req.session.adm) {
         const query = "SELECT * FROM users";
         db.all(query, [], (err, row) => {
             if (err) throw err;
