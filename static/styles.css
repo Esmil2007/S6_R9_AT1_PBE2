@@ -60,11 +60,17 @@ body {
 }
   
 img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
+
+#img-m{
+  width: 150px;
+  height: 150px;
+}
+
 
 button {
   background-color: #3c4276;
@@ -152,9 +158,4 @@ table {
   width: 100%;
   justify-content: space-around;
   text-align: center;
-}
-
-#img-m{
-  width: 110px;
-  height: 110px;
 }
