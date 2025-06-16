@@ -4,11 +4,9 @@
     <a href="/sobre">Sobre</a>
     <a href="/tabela-posts">Posts</a>
     <% if(!req.session.loggedin) { %>
-    <a href="/cadastro">Cadastro</a>
     <a href="/login">Login</a>
     <% } else { %>
     <a href="/dashboard">Dashboard</a>
-    <a href="/tabela-posts">Posts</a>
     <a href="/post_create">Criar Post</a>
     <a href="/logout">Logout</a>
     <% } %>
