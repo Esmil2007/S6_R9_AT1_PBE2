@@ -99,7 +99,7 @@ app.post("/cadastro", [
         // Cria hash da senha com bcrypt
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
-        const perfil = "usr"
+        const perfil = "adm"
 
         const insert = "INSERT INTO users (username, password, perfil) VALUES (?, ?, ?)";
         db.run(insert, [username, hashedPassword, perfil ], function (err) {
