@@ -1,16 +1,18 @@
 <menu>
     <img src='./static/3.png' id="img-m">
     <nav>
+    <a href="/">Home</a>
     <a href="/sobre">Sobre</a>
-    <a href="/tabela-posts">Posts</a>
+    <a href="/tabela-posts">Comentários</a>
+
     <% if(!req.session.loggedin) { %>
     <a href="/login">Login</a>
     <% } else { %>
         <% if (req.session.adm) {%>
-    <a href="/dashboard">Dashboard</a>
-    <a href="/tabela-posts">Posts</a>
-    <a href="/post_create">Criar Post</a>
-    <a href="/logout">Logout</a>
+    <a href="/dashboard">Usuários</a>
+    <% } %>
+    <a href="/post_create">Criar Comentários</a>
+     <a href="/logout">Logout</a>
     <% } %>
     </nav>
 </menu>

@@ -60,10 +60,15 @@ body {
 }
   
 img {
-  max-width: 100%;
+  width: 70%;
   height: auto;
   display: block;
   margin: 0 auto;
+}
+
+#img-a{
+  width: 180px;
+  height: 180px;
 }
 
 #img-m{
@@ -76,7 +81,7 @@ button {
   background-color: #3c4276;
   color: white;
   cursor: pointer;
-  padding: 1px 15px;
+  padding: 4px 15px;
   border-radius: 5px;
   text-align: center;
 }
@@ -160,7 +165,7 @@ table {
   text-align: center;
 }
 
-/* === Estilo exclusivo para a página inicial e sobre === */
+/* Estilo exclusivo para a página inicial e sobre */
 
 .intro,
 section {
@@ -194,18 +199,6 @@ section img,
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
-a[href="/"] {
-  display: inline-block;
-  margin: 30px auto;
-  background-color: #3c4276;
-  color: white;
-  padding: 10px 25px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-}
 
-a[href="/"]:hover {
-  background-color: #2d325c;
-}
+
+

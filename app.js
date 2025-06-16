@@ -69,7 +69,7 @@ app.post("/cadastro", [
         .isAlphanumeric().withMessage('Usuário deve conter apenas letras e números.')
         .trim().escape(),
     body('password')
-        .isLength({ min: 3 }).withMessage('A senha deve ter pelo menos 6 caracteres.')
+        .isLength({ min: 3 }).withMessage('A senha deve ter pelo menos 3 caracteres.')
         .trim()
 ], async (req, res) => {
     console.log("POST /cadastro");
@@ -99,7 +99,7 @@ app.post("/cadastro", [
         // Cria hash da senha com bcrypt
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
-        const perfil = "adm"
+        const perfil = "usr"
 
         const insert = "INSERT INTO users (username, password, perfil) VALUES (?, ?, ?)";
         db.run(insert, [username, hashedPassword, perfil ], function (err) {
@@ -160,7 +160,7 @@ app.post("/login", [
         req.session.id_username = row.id;
         req.session.perfil = row.perfil;
 
-        if (row.perfil === "adm") {
+        if (row.perfil == "adm") {
           req.session.adm = true;
           return res.redirect("/dashboard"); // Rota exclusiva para admin
         } else {
